@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AirlineReservationAPI.Models;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,6 +29,7 @@ namespace AirlineReservationAPI.Controllers
 
         // GET api/<controller>/5
         [HttpGet("{id}")]
+        [HttpHead("{id}")]
         public ActionResult Get(int id)
         {
             var flight = db.Flights.SingleOrDefault(f => f.FlightID == id);
@@ -70,24 +72,31 @@ namespace AirlineReservationAPI.Controllers
                 db.Entry(flight).State = EntityState.Modified;
                 db.SaveChanges();
                 return AcceptedAtAction("Put", new { id = flight.FlightID }, flight);
-            }
+            } 
         }
 
         [HttpPatch("{id}")]
-        public ActionResult Patch([FromBody] Flight flight)
+        public ActionResult Patch(int id, [FromBody] JsonPatchDocument<Flight> Patchflight)
         {
-            var flights = db.Flights.FirstOrDefault(f => f.FlightID == flight.FlightID);
-            if (flights == null)
-                return NotFound();
-            else
+            if(id == null)
             {
-                db.Flights.Add(flights);
-                db.SaveChanges();
-                return Ok();
-
+                return BadRequest();
             }
+                     
+            var flight = db.Flights.SingleOrDefault(f => f.FlightID == id);
             
+            if(flight == null)
+            {
+                return NotFound();
+            }
+
+            Patchflight.ApplyTo(flight);
+            db.SaveChanges();
+
+            return Ok(flight);
         }
+
+
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
