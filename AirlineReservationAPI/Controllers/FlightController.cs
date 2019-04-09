@@ -73,6 +73,22 @@ namespace AirlineReservationAPI.Controllers
             }
         }
 
+        [HttpPatch("{id}")]
+        public ActionResult Patch([FromBody] Flight flight)
+        {
+            var flights = db.Flights.FirstOrDefault(f => f.FlightID == flight.FlightID);
+            if (flights == null)
+                return NotFound();
+            else
+            {
+                flights.FlightDate = flight.FlightDate;
+                flights.FlightDestination = flight.FlightDestination;
+                flights.FlightJetID = flight.FlightJetID;
+                flights.FlightSource = flight.FlightSource;
+                flights.FlightTime = flight.FlightTime;   
+            }
+            return Ok();
+        }
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
@@ -89,5 +105,7 @@ namespace AirlineReservationAPI.Controllers
                 return Ok();
             }
         }
+
+        
     }
 }
