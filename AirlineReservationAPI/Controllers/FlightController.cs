@@ -81,13 +81,12 @@ namespace AirlineReservationAPI.Controllers
                 return NotFound();
             else
             {
-                flights.FlightDate = flight.FlightDate;
-                flights.FlightDestination = flight.FlightDestination;
-                flights.FlightJetID = flight.FlightJetID;
-                flights.FlightSource = flight.FlightSource;
-                flights.FlightTime = flight.FlightTime;   
+                db.Flights.Add(flights);
+                db.SaveChanges();
+                return Ok();
+
             }
-            return Ok();
+            
         }
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
